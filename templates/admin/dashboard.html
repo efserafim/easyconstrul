@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Administrador - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-shield-alt"></i> Dashboard do Administrador
+        </h2>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-cog"></i> Ações Rápidas
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('admin.listar_usuarios') }}">
+                    <i class="fas fa-users"></i> Gerenciar Usuários
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('admin.relatorios') }}">
+                    <i class="fas fa-chart-bar"></i> Relatórios
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('admin.listar_solicitacoes') }}">
+                    <i class="fas fa-exclamation-triangle"></i> Solicitações Pendentes
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Cartões de estatísticas -->
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users display-4 mb-3"></i>
+                    <h2>{{ total_usuarios }}</h2>
+                    <p class="mb-0">Total de Usuários</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-tools display-4 mb-3"></i>
+                    <h2>{{ total_servicos }}</h2>
+                    <p class="mb-0">Serviços Cadastrados</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 bg-warning text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-boxes display-4 mb-3"></i>
+                    <h2>{{ total_materiais }}</h2>
+                    <p class="mb-0">Materiais Cadastrados</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 bg-danger text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-paper-plane display-4 mb-3"></i>
+                    <h2>{{ solicitacoes_pendentes }}</h2>
+                    <p class="mb-0">Solicitações Pendentes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Distribuição de usuários -->
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">
+                        <i class="fas fa-chart-pie"></i> Distribuição de Usuários
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="border rounded p-3">
+                                <i class="fas fa-hard-hat text-primary display-4 mb-2"></i>
+                                <h5>{{ total_trabalhadores }}</h5>
+                                <small class="text-muted">Trabalhadores</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="border rounded p-3">
+                                <i class="fas fa-user-tie text-success display-4 mb-2"></i>
+                                <h5>{{ total_clientes }}</h5>
+                                <small class="text-muted">Clientes</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="border rounded p-3">
+                                <i class="fas fa-store text-warning display-4 mb-2"></i>
+                                <h5>{{ total_lojistas }}</h5>
+                                <small class="text-muted">Lojistas</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="border rounded p-3">
+                                <i class="fas fa-shield-alt text-info display-4 mb-2"></i>
+                                <h5>{{ total_admins }}</h5>
+                                <small class="text-muted">Administradores</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Resumo Geral
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Total de Solicitações:</strong>
+                        <span class="float-end">{{ total_solicitacoes }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Pendentes:</strong>
+                        <span class="float-end badge bg-warning">{{ solicitacoes_pendentes }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Total de Serviços:</strong>
+                        <span class="float-end">{{ total_servicos }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Total de Materiais:</strong>
+                        <span class="float-end">{{ total_materiais }}</span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{{ url_for('admin.relatorios') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-chart-bar"></i> Ver Relatórios Detalhados
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Usuários recentes -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-user-plus"></i> Usuários Recentes
+            </h4>
+            <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-list"></i> Ver Todos
+            </a>
+        </div>
+        <div class="card-body">
+            {% if usuarios_recentes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Tipo</th>
+                                <th>Data de Cadastro</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios_recentes %}
+                                <tr>
+                                    <td>{{ usuario.nome }}</td>
+                                    <td>{{ usuario.email }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ usuario.tipo_usuario|title }}</span>
+                                    </td>
+                                    <td>{{ usuario.data_criacao.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        {% if usuario.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if usuario.tipo_usuario != 'admin' and usuario.id != current_user.id %}
+                                            <a href="{{ url_for('admin.toggle_usuario_ativo', usuario_id=usuario.id) }}" 
+                                               class="btn btn-sm btn-outline-warning"
+                                               onclick="return confirm('Alterar status do usuário?')">
+                                                {% if usuario.ativo %}
+                                                    <i class="fas fa-pause"></i>
+                                                {% else %}
+                                                    <i class="fas fa-play"></i>
+                                                {% endif %}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-users text-muted display-4 mb-3"></i>
+                    <h5 class="text-muted">Nenhum usuário encontrado</h5>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -66,6 +66,37 @@
                                     <i class="fas fa-boxes"></i> Meus Materiais
                                 </a>
                             </li>
+                        {% elif current_user.tipo_usuario == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                    <i class="fas fa-shield-alt"></i> Dashboard Admin
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.listar_usuarios') }}">
+                                    <i class="fas fa-users"></i> Gerenciar Usuários
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-cog"></i> Sistema
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.listar_servicos') }}">
+                                        <i class="fas fa-tools"></i> Serviços
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.listar_materiais') }}">
+                                        <i class="fas fa-boxes"></i> Materiais
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.listar_solicitacoes') }}">
+                                        <i class="fas fa-paper-plane"></i> Solicitações
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.relatorios') }}">
+                                        <i class="fas fa-chart-bar"></i> Relatórios
+                                    </a></li>
+                                </ul>
+                            </li>
                         {% endif %}
                     {% endif %}
                 </ul>

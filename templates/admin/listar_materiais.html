@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Materiais - Administrador - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-boxes"></i> Gerenciar Materiais
+        </h2>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        </a>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label for="categoria" class="form-label">Categoria</label>
+                    <select name="categoria" id="categoria" class="form-select">
+                        <option value="">Todas as Categorias</option>
+                        <option value="cimento" {{ 'selected' if categoria == 'cimento' }}>Cimento e Argamassa</option>
+                        <option value="tijolo" {{ 'selected' if categoria == 'tijolo' }}>Tijolos e Blocos</option>
+                        <option value="tinta" {{ 'selected' if categoria == 'tinta' }}>Tintas e Vernizes</option>
+                        <option value="madeira" {{ 'selected' if categoria == 'madeira' }}>Madeira</option>
+                        <option value="eletrico" {{ 'selected' if categoria == 'eletrico' }}>Material Elétrico</option>
+                        <option value="hidraulico" {{ 'selected' if categoria == 'hidraulico' }}>Material Hidráulico</option>
+                        <option value="ceramica" {{ 'selected' if categoria == 'ceramica' }}>Cerâmica e Azulejo</option>
+                        <option value="ferro" {{ 'selected' if categoria == 'ferro' }}>Ferro e Aço</option>
+                        <option value="ferramenta" {{ 'selected' if categoria == 'ferramenta' }}>Ferramentas</option>
+                        <option value="outros" {{ 'selected' if categoria == 'outros' }}>Outros</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    {% if categoria %}
+                        <a href="{{ url_for('admin.listar_materiais') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Limpar
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Lista de materiais -->
+    {% if materiais %}
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">{{ materiais|length }} material(is) encontrado(s)</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Lojista</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for material in materiais %}
+                                <tr>
+                                    <td>{{ material.id }}</td>
+                                    <td>
+                                        <strong>{{ material.nome }}</strong>
+                                        {% if material.descricao %}
+                                            <br>
+                                            <small class="text-muted">{{ material.descricao[:50] }}...</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ material.categoria|title }}</span>
+                                    </td>
+                                    <td>{{ material.lojista.usuario.nome }}</td>
+                                    <td>
+                                        {% if material.preco %}
+                                            R$ {{ "%.2f"|format(material.preco) }}
+                                            {% if material.unidade %}
+                                                / {{ material.unidade }}
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">Não informado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if material.estoque %}
+                                            {{ material.estoque }}
+                                            {% if material.unidade %}
+                                                {{ material.unidade }}
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if material.disponivel %}
+                                            <span class="badge bg-success">Disponível</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Indisponível</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ material.data_criacao.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#detalhes-material-{{ material.id }}"
+                                                title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="detalhes-material-{{ material.id }}">
+                                    <td colspan="9">
+                                        <div class="bg-light p-3 rounded">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <h6>Descrição Completa:</h6>
+                                                    <p>{{ material.descricao or 'Não informada' }}</p>
+                                                    
+                                                    <h6>Especificações:</h6>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <p class="mb-1"><strong>Categoria:</strong> {{ material.categoria|title }}</p>
+                                                            <p class="mb-1"><strong>Unidade:</strong> {{ material.unidade or 'Não especificada' }}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p class="mb-1"><strong>Preço:</strong> 
+                                                                {% if material.preco %}
+                                                                    R$ {{ "%.2f"|format(material.preco) }}
+                                                                {% else %}
+                                                                    Não informado
+                                                                {% endif %}
+                                                            </p>
+                                                            <p class="mb-1"><strong>Estoque:</strong> {{ material.estoque or 'Não informado' }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <h6>Informações do Lojista:</h6>
+                                                    <p class="mb-1"><strong>Nome:</strong> {{ material.lojista.usuario.nome }}</p>
+                                                    <p class="mb-1"><strong>Loja:</strong> {{ material.lojista.nome_loja }}</p>
+                                                    <p class="mb-1"><strong>Email:</strong> {{ material.lojista.usuario.email }}</p>
+                                                    {% if material.lojista.cidade %}
+                                                        <p class="mb-1"><strong>Cidade:</strong> {{ material.lojista.cidade }}</p>
+                                                    {% endif %}
+                                                    {% if material.lojista.cnpj %}
+                                                        <p class="mb-1"><strong>CNPJ:</strong> {{ material.lojista.cnpj }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-boxes text-muted display-1 mb-3"></i>
+            <h4 class="text-muted">Nenhum material encontrado</h4>
+            {% if categoria %}
+                <p class="text-muted mb-4">
+                    Não foram encontrados materiais na categoria selecionada.
+                </p>
+                <a href="{{ url_for('admin.listar_materiais') }}" class="btn btn-primary">
+                    <i class="fas fa-times"></i> Ver Todos os Materiais
+                </a>
+            {% else %}
+                <p class="text-muted mb-4">
+                    Ainda não há materiais cadastrados no sistema.
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

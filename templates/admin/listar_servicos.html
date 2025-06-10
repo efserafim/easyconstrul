@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Serviços - Administrador - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-tools"></i> Gerenciar Serviços
+        </h2>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        </a>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label for="categoria" class="form-label">Categoria</label>
+                    <select name="categoria" id="categoria" class="form-select">
+                        <option value="">Todas as Categorias</option>
+                        <option value="eletrica" {{ 'selected' if categoria == 'eletrica' }}>Elétrica</option>
+                        <option value="encanamento" {{ 'selected' if categoria == 'encanamento' }}>Encanamento</option>
+                        <option value="alvenaria" {{ 'selected' if categoria == 'alvenaria' }}>Alvenaria</option>
+                        <option value="pintura" {{ 'selected' if categoria == 'pintura' }}>Pintura</option>
+                        <option value="carpintaria" {{ 'selected' if categoria == 'carpintaria' }}>Carpintaria</option>
+                        <option value="serralheria" {{ 'selected' if categoria == 'serralheria' }}>Serralheria</option>
+                        <option value="gesso" {{ 'selected' if categoria == 'gesso' }}>Gesso e Drywall</option>
+                        <option value="ceramica" {{ 'selected' if categoria == 'ceramica' }}>Cerâmica e Azulejo</option>
+                        <option value="telhado" {{ 'selected' if categoria == 'telhado' }}>Telhado e Cobertura</option>
+                        <option value="jardinagem" {{ 'selected' if categoria == 'jardinagem' }}>Jardinagem</option>
+                        <option value="limpeza" {{ 'selected' if categoria == 'limpeza' }}>Limpeza Pós-Obra</option>
+                        <option value="outros" {{ 'selected' if categoria == 'outros' }}>Outros</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    {% if categoria %}
+                        <a href="{{ url_for('admin.listar_servicos') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Limpar
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Lista de serviços -->
+    {% if servicos %}
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">{{ servicos|length }} serviço(s) encontrado(s)</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Categoria</th>
+                                <th>Trabalhador</th>
+                                <th>Preço</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for servico in servicos %}
+                                <tr>
+                                    <td>{{ servico.id }}</td>
+                                    <td>
+                                        <strong>{{ servico.titulo }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ servico.descricao[:50] }}...</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ servico.categoria|title }}</span>
+                                    </td>
+                                    <td>{{ servico.trabalhador.usuario.nome }}</td>
+                                    <td>
+                                        {% if servico.tipo_preco == 'fixo' %}
+                                            R$ {{ "%.2f"|format(servico.preco_minimo or 0) }}
+                                        {% elif servico.tipo_preco == 'por_hora' %}
+                                            R$ {{ "%.2f"|format(servico.preco_minimo or 0) }}/h
+                                        {% else %}
+                                            {% if servico.preco_minimo and servico.preco_maximo %}
+                                                R$ {{ "%.2f"|format(servico.preco_minimo) }} - {{ "%.2f"|format(servico.preco_maximo) }}
+                                            {% else %}
+                                                Negociável
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if servico.disponivel %}
+                                            <span class="badge bg-success">Disponível</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Indisponível</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ servico.data_criacao.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#detalhes-servico-{{ servico.id }}"
+                                                title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="detalhes-servico-{{ servico.id }}">
+                                    <td colspan="8">
+                                        <div class="bg-light p-3 rounded">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <h6>Descrição Completa:</h6>
+                                                    <p>{{ servico.descricao }}</p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <h6>Informações do Trabalhador:</h6>
+                                                    <p class="mb-1"><strong>Nome:</strong> {{ servico.trabalhador.usuario.nome }}</p>
+                                                    <p class="mb-1"><strong>Email:</strong> {{ servico.trabalhador.usuario.email }}</p>
+                                                    <p class="mb-1"><strong>Especialidade:</strong> {{ servico.trabalhador.especialidade|title }}</p>
+                                                    <p class="mb-1"><strong>Experiência:</strong> {{ servico.trabalhador.experiencia_anos or 0 }} anos</p>
+                                                    {% if servico.trabalhador.cidade %}
+                                                        <p class="mb-1"><strong>Cidade:</strong> {{ servico.trabalhador.cidade }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-tools text-muted display-1 mb-3"></i>
+            <h4 class="text-muted">Nenhum serviço encontrado</h4>
+            {% if categoria %}
+                <p class="text-muted mb-4">
+                    Não foram encontrados serviços na categoria selecionada.
+                </p>
+                <a href="{{ url_for('admin.listar_servicos') }}" class="btn btn-primary">
+                    <i class="fas fa-times"></i> Ver Todos os Serviços
+                </a>
+            {% else %}
+                <p class="text-muted mb-4">
+                    Ainda não há serviços cadastrados no sistema.
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
