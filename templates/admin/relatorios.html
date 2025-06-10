@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - Administrador - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-chart-bar"></i> Relatórios e Estatísticas
+        </h2>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        </a>
+    </div>
+    
+    <!-- Gráficos de estatísticas -->
+    <div class="row mb-5">
+        <!-- Serviços por categoria -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools"></i> Serviços por Categoria
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if servicos_por_categoria %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Categoria</th>
+                                        <th class="text-end">Quantidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for categoria, total in servicos_por_categoria %}
+                                        <tr>
+                                            <td>{{ categoria|title }}</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-primary">{{ total }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-chart-bar text-muted display-4 mb-2"></i>
+                            <p class="text-muted">Nenhum serviço cadastrado</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Materiais por categoria -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-boxes"></i> Materiais por Categoria
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if materiais_por_categoria %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Categoria</th>
+                                        <th class="text-end">Quantidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for categoria, total in materiais_por_categoria %}
+                                        <tr>
+                                            <td>{{ categoria|title }}</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-warning">{{ total }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-chart-bar text-muted display-4 mb-2"></i>
+                            <p class="text-muted">Nenhum material cadastrado</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <!-- Status das solicitações -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-paper-plane"></i> Status das Solicitações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if solicitacoes_por_status %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th class="text-end">Quantidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for status, total in solicitacoes_por_status %}
+                                        <tr>
+                                            <td>
+                                                {% if status == 'pendente' %}
+                                                    <span class="badge bg-warning">Pendente</span>
+                                                {% elif status == 'aceito' %}
+                                                    <span class="badge bg-success">Aceito</span>
+                                                {% elif status == 'recusado' %}
+                                                    <span class="badge bg-danger">Recusado</span>
+                                                {% elif status == 'concluido' %}
+                                                    <span class="badge bg-info">Concluído</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>{{ total }}</strong>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-chart-bar text-muted display-4 mb-2"></i>
+                            <p class="text-muted">Nenhuma solicitação registrada</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Novos usuários por mês -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-plus"></i> Novos Usuários (Últimos 30 dias)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if usuarios_por_mes %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Período</th>
+                                        <th class="text-end">Novos Usuários</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for mes, total in usuarios_por_mes %}
+                                        <tr>
+                                            <td>{{ mes.strftime('%B %Y') if mes else 'Período atual' }}</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-success">{{ total }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-chart-bar text-muted display-4 mb-2"></i>
+                            <p class="text-muted">Nenhum usuário novo nos últimos 30 dias</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resumo geral -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle"></i> Resumo Geral do Sistema
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <i class="fas fa-users text-primary display-4 mb-2"></i>
+                        <h4>{{ usuarios_por_mes|sum(attribute='1') if usuarios_por_mes else 0 }}</h4>
+                        <small class="text-muted">Novos usuários (30 dias)</small>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <i class="fas fa-tools text-success display-4 mb-2"></i>
+                        <h4>{{ servicos_por_categoria|sum(attribute='1') if servicos_por_categoria else 0 }}</h4>
+                        <small class="text-muted">Total de serviços</small>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <i class="fas fa-boxes text-warning display-4 mb-2"></i>
+                        <h4>{{ materiais_por_categoria|sum(attribute='1') if materiais_por_categoria else 0 }}</h4>
+                        <small class="text-muted">Total de materiais</small>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <i class="fas fa-paper-plane text-danger display-4 mb-2"></i>
+                        <h4>{{ solicitacoes_por_status|sum(attribute='1') if solicitacoes_por_status else 0 }}</h4>
+                        <small class="text-muted">Total de solicitações</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ações rápidas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt"></i> Ações Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-users"></i> Gerenciar Usuários
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.listar_servicos') }}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-tools"></i> Ver Serviços
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.listar_materiais') }}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-boxes"></i> Ver Materiais
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.listar_solicitacoes') }}" class="btn btn-outline-danger w-100">
+                                <i class="fas fa-paper-plane"></i> Ver Solicitações
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
