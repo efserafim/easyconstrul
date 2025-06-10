@@ -10,7 +10,7 @@ class Usuario(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     telefone = db.Column(db.String(20))
     senha_hash = db.Column(db.String(256), nullable=False)
-    tipo_usuario = db.Column(db.String(20), nullable=False)  # 'trabalhador', 'cliente', 'lojista'
+    tipo_usuario = db.Column(db.String(20), nullable=False)  # 'trabalhador', 'cliente', 'lojista', 'admin'
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     ativo = db.Column(db.Boolean, default=True)
     
@@ -18,6 +18,7 @@ class Usuario(UserMixin, db.Model):
     perfil_trabalhador = db.relationship('PerfilTrabalhador', backref='usuario', uselist=False, cascade='all, delete-orphan')
     perfil_cliente = db.relationship('PerfilCliente', backref='usuario', uselist=False, cascade='all, delete-orphan')
     perfil_lojista = db.relationship('PerfilLojista', backref='usuario', uselist=False, cascade='all, delete-orphan')
+    perfil_administrador = db.relationship('PerfilAdministrador', backref='usuario', uselist=False, cascade='all, delete-orphan')
     
     def definir_senha(self, senha):
         """Criptografa e armazena a senha do usuário"""
@@ -128,3 +129,15 @@ class SolicitacaoServico(db.Model):
     
     def __repr__(self):
         return f'<SolicitacaoServico {self.id}>'
+
+class PerfilAdministrador(db.Model):
+    """Perfil específico para administradores do sistema"""
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    nivel_acesso = db.Column(db.String(20), default='admin')  # admin, super_admin
+    departamento = db.Column(db.String(100))
+    permissoes_especiais = db.Column(db.Text)  # JSON com permissões específicas
+    data_ultimo_acesso = db.Column(db.DateTime)
+    
+    def __repr__(self):
+        return f'<PerfilAdministrador {self.usuario.nome}>'

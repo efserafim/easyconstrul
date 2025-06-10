@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, FloatField, IntegerField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, Email, Length, NumberRange, Optional, EqualTo
+from wtforms.validators import DataRequired, Email, Length, NumberRange, Optional, EqualTo, ValidationError
 from models import Usuario
 
 class FormularioLogin(FlaskForm):
@@ -17,7 +17,8 @@ class FormularioRegistro(FlaskForm):
     tipo_usuario = SelectField('Tipo de Usuário', 
                               choices=[('trabalhador', 'Trabalhador'), 
                                      ('cliente', 'Cliente'), 
-                                     ('lojista', 'Lojista')],
+                                     ('lojista', 'Lojista'),
+                                     ('admin', 'Administrador')],
                               validators=[DataRequired()])
     senha = PasswordField('Senha', validators=[DataRequired(), Length(min=6)])
     confirmar_senha = PasswordField('Confirmar Senha', 
@@ -158,3 +159,24 @@ class FormularioMaterial(FlaskForm):
 class FormularioSolicitacao(FlaskForm):
     """Formulário para solicitar serviço"""
     mensagem = TextAreaField('Mensagem', validators=[DataRequired(), Length(min=10, max=500)])
+
+class FormularioPerfilAdministrador(FlaskForm):
+    """Formulário para perfil do administrador"""
+    nivel_acesso = SelectField('Nível de Acesso',
+                              choices=[('admin', 'Administrador'),
+                                     ('super_admin', 'Super Administrador')],
+                              validators=[DataRequired()])
+    departamento = StringField('Departamento', validators=[Optional(), Length(max=100)])
+    
+class FormularioUsuarioAdmin(FlaskForm):
+    """Formulário para gerenciamento de usuários pelo admin"""
+    nome = StringField('Nome Completo', validators=[DataRequired(), Length(min=2, max=100)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    telefone = StringField('Telefone', validators=[Optional(), Length(max=20)])
+    tipo_usuario = SelectField('Tipo de Usuário', 
+                              choices=[('trabalhador', 'Trabalhador'), 
+                                     ('cliente', 'Cliente'), 
+                                     ('lojista', 'Lojista'),
+                                     ('admin', 'Administrador')],
+                              validators=[DataRequired()])
+    ativo = BooleanField('Usuário Ativo')
