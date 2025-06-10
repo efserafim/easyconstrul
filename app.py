@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
-from config import config
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -16,38 +15,31 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 
-def create_app(config_name=None):
-    """Factory function para criar a aplicação Flask"""
-    app = Flask(__name__)
-    
-    # Determinar configuração
-    if config_name is None:
-        config_name = os.environ.get('FLASK_ENV', 'development')
-    
-    # Carregar configurações
-    app.config.from_object(config.get(config_name, config['default']))
-    config[config_name].init_app(app)
-    
-    # Configurar ProxyFix
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-    
-    # Inicializar extensões
-    db.init_app(app)
-    login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Por favor, faça login para acessar esta página.'
-    login_manager.login_message_category = 'info'
-    
-    # Configurar user_loader dentro do contexto da aplicação
-    @login_manager.user_loader
-    def load_user(user_id):
-        from models import Usuario
-        return Usuario.query.get(int(user_id))
-    
-    return app
+# Criar aplicação Flask
+app = Flask(__name__)
 
-# Criar aplicação
-app = create_app()
+# Configurações básicas
+app.secret_key = os.environ.get('SECRET_KEY', 'easy-constru-development-key-2024-secure')
+
+# Configurar banco de dados - usar SQLite simples como padrão
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///easyconstrul.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configurar ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# Inicializar extensões
+db.init_app(app)
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
+login_manager.login_message = 'Por favor, faça login para acessar esta página.'
+login_manager.login_message_category = 'info'
+
+@login_manager.user_loader
+def carregar_usuario(usuario_id):
+    from models import Usuario
+    return Usuario.query.get(int(usuario_id))
 
 # Inicializar aplicação
 with app.app_context():

@@ -13,10 +13,8 @@ class Config:
     # Configuração do banco de dados
     DATABASE_URL = os.environ.get('DATABASE_URL')
     if not DATABASE_URL:
-        # Criar diretório instance se não existir
-        instance_dir = BASE_DIR / 'instance'
-        instance_dir.mkdir(exist_ok=True)
-        DATABASE_URL = f'sqlite:///{instance_dir}/easyconstrul.db'
+        # Usar caminho absoluto para SQLite
+        DATABASE_URL = f'sqlite:///{BASE_DIR}/easyconstrul.db'
     
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False

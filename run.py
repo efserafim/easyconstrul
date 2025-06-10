@@ -23,13 +23,9 @@ def setup_environment():
     if not os.environ.get('FLASK_ENV'):
         os.environ['FLASK_ENV'] = 'development'
     
-    # Criar diretório instance se não existir
-    instance_dir = project_dir / 'instance'
-    instance_dir.mkdir(exist_ok=True)
-    
-    # Definir URL do banco se não estiver definida
+    # Definir URL do banco se não estiver definida (usar SQLite simples)
     if not os.environ.get('DATABASE_URL'):
-        os.environ['DATABASE_URL'] = f'sqlite:///{instance_dir}/easyconstrul.db'
+        os.environ['DATABASE_URL'] = 'sqlite:///easyconstrul.db'
 
 def main():
     """Função principal para executar a aplicação"""
