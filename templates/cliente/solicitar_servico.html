@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitar Serviço - Cliente - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-paper-plane"></i> Solicitar Serviço
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Informações do serviço -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">{{ servico.titulo }}</h5>
+                                    <p class="card-text">{{ servico.descricao }}</p>
+                                    <span class="badge bg-primary">{{ servico.categoria|title }}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>Profissional:</h6>
+                                    <p class="mb-1"><strong>{{ servico.trabalhador.usuario.nome }}</strong></p>
+                                    <p class="mb-1 small text-muted">{{ servico.trabalhador.especialidade|title }}</p>
+                                    
+                                    {% if servico.trabalhador.cidade %}
+                                        <p class="mb-1 small text-muted">
+                                            <i class="fas fa-map-marker-alt"></i> {{ servico.trabalhador.cidade }}{% if servico.trabalhador.estado %}, {{ servico.trabalhador.estado }}{% endif %}
+                                        </p>
+                                    {% endif %}
+                                    
+                                    {% if servico.trabalhador.experiencia_anos %}
+                                        <p class="mb-1 small text-muted">
+                                            <i class="fas fa-briefcase"></i> {{ servico.trabalhador.experiencia_anos }} anos de experiência
+                                        </p>
+                                    {% endif %}
+                                    
+                                    {% if servico.trabalhador.avaliacao_media > 0 %}
+                                        <p class="mb-1 small text-muted">
+                                            <i class="fas fa-star text-warning"></i> {{ "%.1f"|format(servico.trabalhador.avaliacao_media) }}/5.0
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Informações de preço -->
+                            {% if servico.preco_minimo %}
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Informações de Preço:</h6>
+                                        {% if servico.tipo_preco == 'fixo' %}
+                                            <p class="text-success mb-0">
+                                                <i class="fas fa-dollar-sign"></i> <strong>R$ {{ "%.2f"|format(servico.preco_minimo) }}</strong> (Preço Fixo)
+                                            </p>
+                                        {% elif servico.tipo_preco == 'por_hora' %}
+                                            <p class="text-success mb-0">
+                                                <i class="fas fa-clock"></i> <strong>R$ {{ "%.2f"|format(servico.preco_minimo) }}/hora</strong>
+                                            </p>
+                                        {% elif servico.tipo_preco == 'negociavel' %}
+                                            {% if servico.preco_maximo %}
+                                                <p class="text-success mb-0">
+                                                    <i class="fas fa-handshake"></i> <strong>R$ {{ "%.2f"|format(servico.preco_minimo) }} - {{ "%.2f"|format(servico.preco_maximo) }}</strong> (Negociável)
+                                                </p>
+                                            {% else %}
+                                                <p class="text-info mb-0">
+                                                    <i class="fas fa-handshake"></i> <strong>Preço Negociável</strong>
+                                                </p>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Contato:</h6>
+                                        <p class="mb-1 small">
+                                            <i class="fas fa-envelope"></i> {{ servico.trabalhador.usuario.email }}
+                                        </p>
+                                        {% if servico.trabalhador.usuario.telefone %}
+                                            <p class="mb-0 small">
+                                                <i class="fas fa-phone"></i> {{ servico.trabalhador.usuario.telefone }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Formulário de solicitação -->
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.mensagem.label(class="form-label") }}
+                            {{ form.mensagem(class="form-control", rows="6", placeholder="Descreva detalhadamente seu projeto:\n\n• Localização da obra\n• Prazo desejado\n• Detalhes específicos do serviço\n• Materiais que você já possui (se houver)\n• Horário de preferência para contato\n• Qualquer informação adicional relevante") }}
+                            {% if form.mensagem.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.mensagem.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Seja específico sobre suas necessidades para receber uma proposta mais precisa.
+                            </div>
+                        </div>
+                        
+                        <!-- Informações importantes -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Informações Importantes:</h6>
+                            <ul class="mb-0 small">
+                                <li><strong>Sua solicitação será enviada diretamente para o profissional</strong></li>
+                                <li>O trabalhador entrará em contato através do email ou telefone cadastrado</li>
+                                <li>Combine todos os detalhes do serviço antes de confirmar</li>
+                                <li>Sempre solicite comprovantes e garantias do trabalho</li>
+                                <li>Em caso de problemas, você pode entrar em contato conosco</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Informações do cliente -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="fas fa-user"></i> Suas Informações de Contato</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Nome:</strong> {{ current_user.nome }}</p>
+                                        <p class="mb-1"><strong>Email:</strong> {{ current_user.email }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% if current_user.telefone %}
+                                            <p class="mb-1"><strong>Telefone:</strong> {{ current_user.telefone }}</p>
+                                        {% endif %}
+                                        {% if current_user.perfil_cliente and current_user.perfil_cliente.cidade %}
+                                            <p class="mb-1"><strong>Cidade:</strong> 
+                                                {{ current_user.perfil_cliente.cidade }}{% if current_user.perfil_cliente.estado %}, {{ current_user.perfil_cliente.estado }}{% endif %}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt"></i> Essas informações serão compartilhadas com o profissional para que ele possa entrar em contato.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('cliente.buscar_servicos') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar à Busca
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> Enviar Solicitação
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Serviços - Cliente - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-primary mb-4">
+        <i class="fas fa-search"></i> Buscar Serviços
+    </h2>
+    
+    <!-- Filtros de busca -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label for="categoria" class="form-label">Categoria</label>
+                    <select name="categoria" id="categoria" class="form-select">
+                        <option value="">Todas as Categorias</option>
+                        <option value="eletrica" {{ 'selected' if categoria == 'eletrica' }}>Elétrica</option>
+                        <option value="encanamento" {{ 'selected' if categoria == 'encanamento' }}>Encanamento</option>
+                        <option value="alvenaria" {{ 'selected' if categoria == 'alvenaria' }}>Alvenaria</option>
+                        <option value="pintura" {{ 'selected' if categoria == 'pintura' }}>Pintura</option>
+                        <option value="carpintaria" {{ 'selected' if categoria == 'carpintaria' }}>Carpintaria</option>
+                        <option value="serralheria" {{ 'selected' if categoria == 'serralheria' }}>Serralheria</option>
+                        <option value="gesso" {{ 'selected' if categoria == 'gesso' }}>Gesso e Drywall</option>
+                        <option value="ceramica" {{ 'selected' if categoria == 'ceramica' }}>Cerâmica e Azulejo</option>
+                        <option value="telhado" {{ 'selected' if categoria == 'telhado' }}>Telhado e Cobertura</option>
+                        <option value="jardinagem" {{ 'selected' if categoria == 'jardinagem' }}>Jardinagem</option>
+                        <option value="limpeza" {{ 'selected' if categoria == 'limpeza' }}>Limpeza Pós-Obra</option>
+                        <option value="outros" {{ 'selected' if categoria == 'outros' }}>Outros</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="cidade" class="form-label">Cidade</label>
+                    <input type="text" name="cidade" id="cidade" class="form-control" value="{{ cidade }}" placeholder="Digite a cidade">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Resultados da busca -->
+    {% if servicos %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>{{ servicos|length }} serviço(s) encontrado(s)</h5>
+            {% if categoria or cidade %}
+                <a href="{{ url_for('cliente.buscar_servicos') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-times"></i> Limpar Filtros
+                </a>
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            {% for servico in servicos %}
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">{{ servico.categoria|title }}</span>
+                                {% if servico.preco_minimo and servico.preco_maximo %}
+                                    <small class="text-success fw-bold">
+                                        R$ {{ "%.2f"|format(servico.preco_minimo) }} - {{ "%.2f"|format(servico.preco_maximo) }}
+                                    </small>
+                                {% elif servico.preco_minimo %}
+                                    <small class="text-success fw-bold">
+                                        {% if servico.tipo_preco == 'por_hora' %}
+                                            R$ {{ "%.2f"|format(servico.preco_minimo) }}/h
+                                        {% else %}
+                                            R$ {{ "%.2f"|format(servico.preco_minimo) }}
+                                        {% endif %}
+                                    </small>
+                                {% endif %}
+                            </div>
+                            
+                            <h5 class="card-title">{{ servico.titulo }}</h5>
+                            <p class="card-text text-muted">
+                                {{ servico.descricao[:120] }}{% if servico.descricao|length > 120 %}...{% endif %}
+                            </p>
+                            
+                            <!-- Informações do trabalhador -->
+                            <div class="border-top pt-3 mt-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-user-circle text-primary me-2"></i>
+                                    <div>
+                                        <strong>{{ servico.trabalhador.usuario.nome }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ servico.trabalhador.especialidade|title }}</small>
+                                    </div>
+                                </div>
+                                
+                                {% if servico.trabalhador.cidade %}
+                                    <div class="mb-2">
+                                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                                        <small class="text-muted">{{ servico.trabalhador.cidade }}{% if servico.trabalhador.estado %}, {{ servico.trabalhador.estado }}{% endif %}</small>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if servico.trabalhador.experiencia_anos %}
+                                    <div class="mb-2">
+                                        <i class="fas fa-briefcase text-muted me-2"></i>
+                                        <small class="text-muted">{{ servico.trabalhador.experiencia_anos }} anos de experiência</small>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if servico.trabalhador.avaliacao_media > 0 %}
+                                    <div class="mb-2">
+                                        <i class="fas fa-star text-warning me-2"></i>
+                                        <small class="text-muted">{{ "%.1f"|format(servico.trabalhador.avaliacao_media) }}/5.0 ({{ servico.trabalhador.total_avaliacoes }} avaliações)</small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> {{ servico.data_criacao.strftime('%d/%m/%Y') }}
+                                </small>
+                                <a href="{{ url_for('cliente.solicitar_servico', servico_id=servico.id) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-paper-plane"></i> Solicitar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search text-muted display-1 mb-3"></i>
+            <h4 class="text-muted">Nenhum serviço encontrado</h4>
+            {% if categoria or cidade %}
+                <p class="text-muted mb-4">
+                    Não foram encontrados serviços com os filtros aplicados. Tente ajustar os critérios de busca.
+                </p>
+                <a href="{{ url_for('cliente.buscar_servicos') }}" class="btn btn-primary">
+                    <i class="fas fa-times"></i> Limpar Filtros
+                </a>
+            {% else %}
+                <p class="text-muted mb-4">
+                    Ainda não há serviços cadastrados na plataforma. Volte em breve para encontrar profissionais qualificados.
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

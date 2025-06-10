@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil - Trabalhador - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user"></i> Meu Perfil - Trabalhador
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Informações básicas do usuário -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" value="{{ current_user.nome }}" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="{{ current_user.email }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Informações profissionais -->
+                        <h5 class="text-primary mb-3"><i class="fas fa-briefcase"></i> Informações Profissionais</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.especialidade.label(class="form-label") }}
+                                {{ form.especialidade(class="form-select") }}
+                                {% if form.especialidade.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.especialidade.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.experiencia_anos.label(class="form-label") }}
+                                {{ form.experiencia_anos(class="form-control") }}
+                                {% if form.experiencia_anos.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.experiencia_anos.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.descricao.label(class="form-label") }}
+                            {{ form.descricao(class="form-control", rows="4", placeholder="Descreva seus serviços, experiência e diferenciais...") }}
+                            {% if form.descricao.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.descricao.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <h5 class="text-primary mb-3"><i class="fas fa-map-marker-alt"></i> Localização</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                {{ form.cidade.label(class="form-label") }}
+                                {{ form.cidade(class="form-control") }}
+                                {% if form.cidade.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.cidade.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                {{ form.estado.label(class="form-label") }}
+                                {{ form.estado(class="form-select") }}
+                                {% if form.estado.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.estado.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Estatísticas do perfil -->
+                        {% if perfil.avaliacao_media > 0 %}
+                            <div class="alert alert-success">
+                                <h6 class="alert-heading"><i class="fas fa-star"></i> Suas Estatísticas</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Avaliação Média:</strong> 
+                                        {{ "%.1f"|format(perfil.avaliacao_media) }}/5.0
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Total de Avaliações:</strong> 
+                                        {{ perfil.total_avaliacoes }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('trabalhador.listar_servicos') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-tools"></i> Meus Serviços
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

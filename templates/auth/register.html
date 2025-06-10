@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center py-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="EasyConstrul" height="60" class="mb-3">
+                        <h2 class="fw-bold text-primary">Cadastrar</h2>
+                        <p class="text-muted">Crie sua conta EasyConstrul</p>
+                    </div>
+                    
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.nome.label(class="form-label") }}
+                                {{ form.nome(class="form-control") }}
+                                {% if form.nome.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.nome.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control") }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.email.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.telefone.label(class="form-label") }}
+                                {{ form.telefone(class="form-control") }}
+                                {% if form.telefone.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.telefone.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.tipo_usuario.label(class="form-label") }}
+                                {{ form.tipo_usuario(class="form-select") }}
+                                {% if form.tipo_usuario.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.tipo_usuario.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.senha.label(class="form-label") }}
+                                {{ form.senha(class="form-control") }}
+                                {% if form.senha.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.senha.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.confirmar_senha.label(class="form-label") }}
+                                {{ form.confirmar_senha(class="form-control") }}
+                                {% if form.confirmar_senha.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.confirmar_senha.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Informações sobre tipos de usuário -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Tipos de Usuário:</h6>
+                            <ul class="mb-0 small">
+                                <li><strong>Trabalhador:</strong> Divulgue seus serviços e conecte-se com clientes</li>
+                                <li><strong>Cliente:</strong> Encontre profissionais para sua obra</li>
+                                <li><strong>Lojista:</strong> Divulgue materiais de construção</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Cadastrar
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Já tem uma conta? 
+                            <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold">
+                                Faça login
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

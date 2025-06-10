@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Meus Materiais - Lojista - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-boxes"></i> Meus Materiais
+        </h2>
+        <a href="{{ url_for('lojista.criar_material') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Material
+        </a>
+    </div>
+    
+    {% if materiais %}
+        <div class="row">
+            {% for material in materiais %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-secondary">{{ material.categoria|title }}</span>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit"></i> Editar</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash"></i> Excluir</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <h5 class="card-title">{{ material.nome }}</h5>
+                            
+                            {% if material.descricao %}
+                                <p class="card-text text-muted">
+                                    {{ material.descricao[:100] }}{% if material.descricao|length > 100 %}...{% endif %}
+                                </p>
+                            {% endif %}
+                            
+                            <!-- Informações de preço e estoque -->
+                            <div class="mb-3">
+                                {% if material.preco %}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="h6 text-success mb-0">
+                                            <i class="fas fa-dollar-sign"></i> R$ {{ "%.2f"|format(material.preco) }}
+                                        </span>
+                                        {% if material.unidade %}
+                                            <small class="text-muted">por {{ material.unidade }}</small>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if material.estoque is not none %}
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-cube"></i> Estoque:
+                                        </small>
+                                        <span class="badge {% if material.estoque > 10 %}bg-success{% elif material.estoque > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ material.estoque }}{% if material.unidade %} {{ material.unidade }}{% endif %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Status de disponibilidade -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if material.disponivel %}
+                                        <span class="badge bg-success">Disponível</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Indisponível</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Botão para alternar disponibilidade -->
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" {% if material.disponivel %}checked{% endif %} 
+                                           onchange="toggleDisponibilidade({{ material.id }})">
+                                    <label class="form-check-label small text-muted">
+                                        Ativo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i> Criado em {{ material.data_criacao.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Resumo por categoria -->
+        <div class="mt-5">
+            <h4 class="text-primary mb-3">
+                <i class="fas fa-chart-pie"></i> Resumo por Categoria
+            </h4>
+            <div class="row">
+                {% set categorias = {} %}
+                {% for material in materiais %}
+                    {% if categorias.update({material.categoria: categorias.get(material.categoria, 0) + 1}) %}{% endif %}
+                {% endfor %}
+                
+                {% for categoria, quantidade in categorias.items() %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="text-primary">{{ quantidade }}</h5>
+                                <p class="mb-0 small">{{ categoria|title }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-boxes text-muted display-1 mb-3"></i>
+            <h4 class="text-muted">Nenhum material cadastrado</h4>
+            <p class="text-muted mb-4">
+                Você ainda não cadastrou nenhum material. Comece adicionando seus produtos para aparecer nas buscas dos clientes.
+            </p>
+            <a href="{{ url_for('lojista.criar_material') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Cadastrar Primeiro Material
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleDisponibilidade(materialId) {
+    // Aqui seria implementada a funcionalidade para alternar disponibilidade via AJAX
+    // Por enquanto, apenas um placeholder
+    console.log('Alternar disponibilidade do material:', materialId);
+}
+</script>
+{% endblock %}

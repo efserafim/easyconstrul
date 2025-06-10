@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Criar Material - Lojista - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-plus"></i> Cadastrar Novo Material
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                {{ form.nome.label(class="form-label") }}
+                                {{ form.nome(class="form-control", placeholder="Ex: Cimento Portland CP II-E 40 50kg") }}
+                                {% if form.nome.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.nome.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                {{ form.categoria.label(class="form-label") }}
+                                {{ form.categoria(class="form-select") }}
+                                {% if form.categoria.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.categoria.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.descricao.label(class="form-label") }}
+                            {{ form.descricao(class="form-control", rows="4", placeholder="Descreva as características do material, especificações técnicas, aplicações, etc.") }}
+                            {% if form.descricao.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.descricao.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <h5 class="text-primary mb-3"><i class="fas fa-dollar-sign"></i> Informações Comerciais</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form.preco.label(class="form-label") }}
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    {{ form.preco(class="form-control", step="0.01", placeholder="0,00") }}
+                                </div>
+                                {% if form.preco.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.preco.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                {{ form.unidade.label(class="form-label") }}
+                                {{ form.unidade(class="form-select") }}
+                                {% if form.unidade.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.unidade.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                {{ form.estoque.label(class="form-label") }}
+                                {{ form.estoque(class="form-control", placeholder="0") }}
+                                {% if form.estoque.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.estoque.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Dicas para seu material:</h6>
+                            <ul class="mb-0 small">
+                                <li>Use nomes descritivos incluindo marca, modelo e especificações</li>
+                                <li>Detalhe as características técnicas na descrição</li>
+                                <li>Mantenha preços competitivos e atualizados</li>
+                                <li>Atualize regularmente o estoque disponível</li>
+                                <li>Inclua informações sobre garantia e qualidade quando aplicável</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Exemplos por categoria -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="fas fa-lightbulb"></i> Exemplos por Categoria</h6>
+                                <div class="row small">
+                                    <div class="col-md-6">
+                                        <strong>Cimento e Argamassa:</strong>
+                                        <ul class="mb-2">
+                                            <li>Cimento Portland CP II-E 40 50kg</li>
+                                            <li>Argamassa AC-I para assentamento</li>
+                                        </ul>
+                                        <strong>Tijolos e Blocos:</strong>
+                                        <ul class="mb-2">
+                                            <li>Tijolo comum 6 furos</li>
+                                            <li>Bloco de concreto 14x19x39cm</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Material Elétrico:</strong>
+                                        <ul class="mb-2">
+                                            <li>Fio flexível 2,5mm² 100m</li>
+                                            <li>Disjuntor monofásico 25A</li>
+                                        </ul>
+                                        <strong>Tintas e Vernizes:</strong>
+                                        <ul class="mb-2">
+                                            <li>Tinta acrílica branca 18L</li>
+                                            <li>Primer para metal 3,6L</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('lojista.listar_materiais') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Cadastrar Material
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sugestões automáticas baseadas na categoria selecionada
+document.getElementById('categoria').addEventListener('change', function() {
+    const categoria = this.value;
+    const nomeField = document.getElementById('nome');
+    const descricaoField = document.getElementById('descricao');
+    
+    // Limpar campos se categoria for alterada
+    if (categoria && !nomeField.value && !descricaoField.value) {
+        let sugestoes = {
+            'cimento': {
+                nome: 'Cimento Portland',
+                descricao: 'Cimento de alta qualidade para construção civil, ideal para alvenaria estrutural e acabamentos.'
+            },
+            'tijolo': {
+                nome: 'Tijolo comum',
+                descricao: 'Tijolo cerâmico tradicional para alvenaria, com boa resistência e isolamento térmico.'
+            },
+            'tinta': {
+                nome: 'Tinta acrílica',
+                descricao: 'Tinta de acabamento fosco/acetinado, lavável, para aplicação em paredes internas e externas.'
+            },
+            'eletrico': {
+                nome: 'Fio flexível',
+                descricao: 'Cabo elétrico flexível para instalações residenciais e comerciais, conforme norma NBR.'
+            },
+            'hidraulico': {
+                nome: 'Tubo PVC',
+                descricao: 'Tubo em PVC rígido para instalações hidráulicas prediais, resistente e durável.'
+            }
+        };
+        
+        if (sugestoes[categoria]) {
+            nomeField.placeholder = `Ex: ${sugestoes[categoria].nome}`;
+            descricaoField.placeholder = sugestoes[categoria].descricao;
+        }
+    }
+});
+</script>
+{% endblock %}

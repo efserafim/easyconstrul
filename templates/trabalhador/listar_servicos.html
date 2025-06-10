@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Meus Serviços - Trabalhador - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-tools"></i> Meus Serviços
+        </h2>
+        <a href="{{ url_for('trabalhador.criar_servico') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Serviço
+        </a>
+    </div>
+    
+    {% if servicos %}
+        <div class="row">
+            {% for servico in servicos %}
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">{{ servico.categoria|title }}</span>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit"></i> Editar</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash"></i> Excluir</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <h5 class="card-title">{{ servico.titulo }}</h5>
+                            <p class="card-text text-muted">
+                                {{ servico.descricao[:100] }}{% if servico.descricao|length > 100 %}...{% endif %}
+                            </p>
+                            
+                            <!-- Informações de preço -->
+                            <div class="mb-3">
+                                {% if servico.tipo_preco == 'fixo' %}
+                                    {% if servico.preco_minimo %}
+                                        <span class="h6 text-success">
+                                            <i class="fas fa-dollar-sign"></i> R$ {{ "%.2f"|format(servico.preco_minimo) }}
+                                        </span>
+                                    {% endif %}
+                                {% elif servico.tipo_preco == 'por_hora' %}
+                                    {% if servico.preco_minimo %}
+                                        <span class="h6 text-success">
+                                            <i class="fas fa-clock"></i> R$ {{ "%.2f"|format(servico.preco_minimo) }}/hora
+                                        </span>
+                                    {% endif %}
+                                {% elif servico.tipo_preco == 'negociavel' %}
+                                    {% if servico.preco_minimo and servico.preco_maximo %}
+                                        <span class="h6 text-success">
+                                            <i class="fas fa-handshake"></i> R$ {{ "%.2f"|format(servico.preco_minimo) }} - {{ "%.2f"|format(servico.preco_maximo) }}
+                                        </span>
+                                    {% else %}
+                                        <span class="h6 text-info">
+                                            <i class="fas fa-handshake"></i> Preço Negociável
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Status e estatísticas -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if servico.disponivel %}
+                                        <span class="badge bg-success">Disponível</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Pausado</span>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-paper-plane"></i> {{ servico.solicitacoes|length }} solicitações
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i> Criado em {{ servico.data_criacao.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-tools text-muted display-1 mb-3"></i>
+            <h4 class="text-muted">Nenhum serviço cadastrado</h4>
+            <p class="text-muted mb-4">
+                Você ainda não cadastrou nenhum serviço. Comece criando seu primeiro serviço para aparecer nas buscas dos clientes.
+            </p>
+            <a href="{{ url_for('trabalhador.criar_servico') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Criar Primeiro Serviço
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

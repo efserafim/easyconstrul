@@ -1,0 +1,55 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2c5aa0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e3f73;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="orangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e55a2b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fundo do ícone -->
+  <rect x="2" y="6" width="28" height="28" rx="6" fill="url(#primaryGradient)"/>
+  
+  <!-- Capacete de construção -->
+  <path d="M16 10c-4 0-7 2.5-7 6v2h14v-2c0-3.5-3-6-7-6z" fill="white"/>
+  <ellipse cx="16" cy="18.5" rx="8" ry="1.5" fill="#ffc107"/>
+  
+  <!-- Ferramentas cruzadas -->
+  <g transform="translate(18, 20)">
+    <!-- Martelo -->
+    <rect x="-1" y="2" width="2" height="8" fill="url(#orangeGradient)"/>
+    <rect x="-3" y="1" width="6" height="2" rx="1" fill="url(#orangeGradient)"/>
+    
+    <!-- Chave inglesa (rotacionada) -->
+    <g transform="rotate(45)">
+      <rect x="-0.5" y="2" width="1" height="6" fill="#6c757d"/>
+      <circle cx="0" cy="2" r="1.5" fill="#6c757d"/>
+    </g>
+  </g>
+  
+  <!-- Texto "EasyConstrul" -->
+  <text x="38" y="16" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="url(#primaryGradient)">Easy</text>
+  <text x="38" y="28" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="url(#orangeGradient)">Construl</text>
+  
+  <!-- Elementos decorativos (tijolos pequenos) -->
+  <rect x="85" y="8" width="4" height="2" fill="#e74c3c" opacity="0.7"/>
+  <rect x="90" y="8" width="4" height="2" fill="#c0392b" opacity="0.7"/>
+  <rect x="87.5" y="11" width="4" height="2" fill="#e74c3c" opacity="0.7"/>
+  
+  <rect x="100" y="25" width="3" height="2" fill="#95a5a6" opacity="0.6"/>
+  <rect x="104" y="25" width="3" height="2" fill="#7f8c8d" opacity="0.6"/>
+  <rect x="101.5" y="28" width="3" height="2" fill="#95a5a6" opacity="0.6"/>
+  
+  <!-- Ícone de engrenagem pequeno -->
+  <g transform="translate(110, 15) scale(0.8)">
+    <circle cx="0" cy="0" r="3" fill="none" stroke="url(#primaryGradient)" stroke-width="1"/>
+    <circle cx="0" cy="0" r="1" fill="url(#primaryGradient)"/>
+    <path d="M0,-3 L1,-2 L0,-1 L-1,-2 Z" fill="url(#primaryGradient)"/>
+    <path d="M3,0 L2,1 L1,0 L2,-1 Z" fill="url(#primaryGradient)"/>
+    <path d="M0,3 L-1,2 L0,1 L1,2 Z" fill="url(#primaryGradient)"/>
+    <path d="M-3,0 L-2,-1 L-1,0 L-2,1 Z" fill="url(#primaryGradient)"/>
+  </g>
+</svg>

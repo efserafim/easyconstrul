@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Lojista - EasyConstrul{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-store"></i> Dashboard do Lojista
+        </h2>
+        <a href="{{ url_for('lojista.criar_material') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Material
+        </a>
+    </div>
+    
+    <!-- Informações da loja -->
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">
+                        <i class="fas fa-store-alt"></i> Informações da Loja
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if perfil %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>{{ perfil.nome_loja }}</h5>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-user"></i> {{ current_user.nome }}
+                                </p>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-envelope"></i> {{ current_user.email }}
+                                </p>
+                                {% if current_user.telefone %}
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-phone"></i> {{ current_user.telefone }}
+                                    </p>
+                                {% endif %}
+                                {% if perfil.cnpj %}
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-building"></i> CNPJ: {{ perfil.cnpj }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if perfil.endereco %}
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt"></i> {{ perfil.endereco }}
+                                    </p>
+                                {% endif %}
+                                {% if perfil.cidade %}
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-city"></i> {{ perfil.cidade }}{% if perfil.estado %}, {{ perfil.estado }}{% endif %}
+                                    </p>
+                                {% endif %}
+                                {% if perfil.cep %}
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-mail-bulk"></i> CEP: {{ perfil.cep }}
+                                    </p>
+                                {% endif %}
+                                {% if perfil.horario_funcionamento %}
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-clock"></i> {{ perfil.horario_funcionamento }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit"></i> Editar Informações
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-exclamation-triangle text-warning display-4 mb-3"></i>
+                            <h5>Perfil incompleto</h5>
+                            <p class="text-muted mb-3">Complete suas informações de lojista para aparecer nas buscas.</p>
+                            <a href="#" class="btn btn-primary">
+                                <i class="fas fa-user-edit"></i> Completar Perfil
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estatísticas -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-boxes display-4 mb-3"></i>
+                    <h2>{{ total_materiais }}</h2>
+                    <p class="mb-0">Materiais Cadastrados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Materiais recentes -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-boxes"></i> Materiais Recentes
+            </h4>
+            <a href="{{ url_for('lojista.listar_materiais') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-list"></i> Ver Todos
+            </a>
+        </div>
+        <div class="card-body">
+            {% if perfil and perfil.materiais %}
+                <div class="row">
+                    {% for material in perfil.materiais[:6] %}
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge bg-secondary">{{ material.categoria|title }}</span>
+                                        {% if material.preco %}
+                                            <small class="text-success fw-bold">
+                                                R$ {{ "%.2f"|format(material.preco) }}
+                                                {% if material.unidade %}/{{ material.unidade }}{% endif %}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <h6 class="card-title">{{ material.nome }}</h6>
+                                    
+                                    {% if material.descricao %}
+                                        <p class="card-text small text-muted">
+                                            {{ material.descricao[:60] }}{% if material.descricao|length > 60 %}...{% endif %}
+                                        </p>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        {% if material.estoque is not none %}
+                                            <small class="text-muted">
+                                                <i class="fas fa-cube"></i> Estoque: {{ material.estoque }}
+                                            </small>
+                                        {% endif %}
+                                        
+                                        {% if material.disponivel %}
+                                            <span class="badge bg-success">Disponível</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Indisponível</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-boxes text-muted display-1 mb-3"></i>
+                    <h4 class="text-muted">Nenhum material cadastrado</h4>
+                    <p class="text-muted mb-4">
+                        Você ainda não cadastrou nenhum material. Comece adicionando seus produtos para aparecer nas buscas.
+                    </p>
+                    <a href="{{ url_for('lojista.criar_material') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> Cadastrar Primeiro Material
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Categorias populares -->
+    <div class="mt-5">
+        <h4 class="text-primary mb-3">
+            <i class="fas fa-tags"></i> Categorias de Materiais
+        </h4>
+        <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <i class="fas fa-cube text-secondary display-4 mb-2"></i>
+                        <h6>Cimento e Argamassa</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <i class="fas fa-th-large text-danger display-4 mb-2"></i>
+                        <h6>Tijolos e Blocos</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <i class="fas fa-paint-brush text-success display-4 mb-2"></i>
+                        <h6>Tintas e Vernizes</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <i class="fas fa-tree text-warning display-4 mb-2"></i>
+                        <h6>Madeira</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
