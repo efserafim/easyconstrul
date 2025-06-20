@@ -349,6 +349,48 @@ def solicitar_servico(servico_id):
     
     return render_template('cliente/solicitar_servico.html', form=form, servico=servico)
 
+@cliente.route('/materiais')
+@login_required
+def buscar_materiais():
+    """Buscar materiais disponíveis"""
+    if current_user.tipo_usuario != 'cliente':
+        abort(403)
+    
+    categoria = request.args.get('categoria', '')
+    cidade = request.args.get('cidade', '')
+    busca = request.args.get('busca', '')
+    
+    query = Material.query.filter_by(disponivel=True)
+    
+    if categoria:
+        query = query.filter_by(categoria=categoria)
+    
+    if cidade:
+        query = query.join(PerfilLojista).filter(PerfilLojista.cidade.ilike(f'%{cidade}%'))
+    
+    if busca:
+        query = query.filter(Material.nome.ilike(f'%{busca}%'))
+    
+    materiais = query.order_by(Material.data_criacao.desc()).all()
+    
+    return render_template('cliente/buscar_materiais.html', materiais=materiais, 
+                         categoria=categoria, cidade=cidade, busca=busca)
+
+@cliente.route('/material/<int:material_id>')
+@login_required
+def ver_material(material_id):
+    """Ver detalhes de um material"""
+    if current_user.tipo_usuario != 'cliente':
+        abort(403)
+    
+    material = Material.query.get_or_404(material_id)
+    
+    if not material.disponivel:
+        flash('Este material não está mais disponível.', 'warning')
+        return redirect(url_for('cliente.buscar_materiais'))
+    
+    return render_template('cliente/ver_material.html', material=material)
+
 # Blueprint do lojista
 lojista = Blueprint('lojista', __name__)
 
