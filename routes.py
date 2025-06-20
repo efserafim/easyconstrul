@@ -185,6 +185,108 @@ def criar_servico():
     
     return render_template('trabalhador/criar_servico.html', form=form)
 
+@trabalhador.route('/solicitacoes')
+@login_required
+def listar_solicitacoes():
+    """Lista solicitações recebidas pelo trabalhador"""
+    if current_user.tipo_usuario != 'trabalhador':
+        abort(403)
+    
+    perfil_trab = current_user.perfil_trabalhador
+    if not perfil_trab:
+        abort(404)
+    
+    # Buscar todas as solicitações para os serviços do trabalhador
+    from datetime import datetime
+    solicitacoes = db.session.query(SolicitacaoServico).join(Servico).filter(
+        Servico.trabalhador_id == perfil_trab.id
+    ).order_by(SolicitacaoServico.data_solicitacao.desc()).all()
+    
+    return render_template('trabalhador/solicitacoes.html', solicitacoes=solicitacoes)
+
+@trabalhador.route('/solicitacao/<int:solicitacao_id>/aceitar', methods=['POST'])
+@login_required
+def aceitar_solicitacao(solicitacao_id):
+    """Aceitar uma solicitação de serviço"""
+    if current_user.tipo_usuario != 'trabalhador':
+        abort(403)
+    
+    # Verificar se a solicitação pertence ao trabalhador
+    solicitacao = db.session.query(SolicitacaoServico).join(Servico).filter(
+        SolicitacaoServico.id == solicitacao_id,
+        Servico.trabalhador_id == current_user.perfil_trabalhador.id
+    ).first()
+    
+    if not solicitacao:
+        abort(404)
+    
+    if solicitacao.status != 'pendente':
+        flash('Esta solicitação já foi respondida.', 'warning')
+        return redirect(url_for('trabalhador.listar_solicitacoes'))
+    
+    # Aceitar a solicitação
+    solicitacao.status = 'aceito'
+    solicitacao.data_resposta = datetime.utcnow()
+    db.session.commit()
+    
+    flash(f'Solicitação de {solicitacao.cliente.usuario.nome} foi aceita!', 'success')
+    return redirect(url_for('trabalhador.listar_solicitacoes'))
+
+@trabalhador.route('/solicitacao/<int:solicitacao_id>/recusar', methods=['POST'])
+@login_required
+def recusar_solicitacao(solicitacao_id):
+    """Recusar uma solicitação de serviço"""
+    if current_user.tipo_usuario != 'trabalhador':
+        abort(403)
+    
+    # Verificar se a solicitação pertence ao trabalhador
+    solicitacao = db.session.query(SolicitacaoServico).join(Servico).filter(
+        SolicitacaoServico.id == solicitacao_id,
+        Servico.trabalhador_id == current_user.perfil_trabalhador.id
+    ).first()
+    
+    if not solicitacao:
+        abort(404)
+    
+    if solicitacao.status != 'pendente':
+        flash('Esta solicitação já foi respondida.', 'warning')
+        return redirect(url_for('trabalhador.listar_solicitacoes'))
+    
+    # Recusar a solicitação
+    solicitacao.status = 'recusado'
+    solicitacao.data_resposta = datetime.utcnow()
+    db.session.commit()
+    
+    flash(f'Solicitação de {solicitacao.cliente.usuario.nome} foi recusada.', 'info')
+    return redirect(url_for('trabalhador.listar_solicitacoes'))
+
+@trabalhador.route('/solicitacao/<int:solicitacao_id>/concluir', methods=['POST'])
+@login_required
+def concluir_solicitacao(solicitacao_id):
+    """Marcar uma solicitação como concluída"""
+    if current_user.tipo_usuario != 'trabalhador':
+        abort(403)
+    
+    # Verificar se a solicitação pertence ao trabalhador
+    solicitacao = db.session.query(SolicitacaoServico).join(Servico).filter(
+        SolicitacaoServico.id == solicitacao_id,
+        Servico.trabalhador_id == current_user.perfil_trabalhador.id
+    ).first()
+    
+    if not solicitacao:
+        abort(404)
+    
+    if solicitacao.status != 'aceito':
+        flash('Apenas solicitações aceitas podem ser marcadas como concluídas.', 'warning')
+        return redirect(url_for('trabalhador.listar_solicitacoes'))
+    
+    # Marcar como concluída
+    solicitacao.status = 'concluido'
+    db.session.commit()
+    
+    flash(f'Serviço para {solicitacao.cliente.usuario.nome} foi marcado como concluído!', 'success')
+    return redirect(url_for('trabalhador.listar_solicitacoes'))
+
 # Blueprint do cliente
 cliente = Blueprint('cliente', __name__)
 

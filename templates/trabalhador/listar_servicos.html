@@ -74,9 +74,18 @@
                                         <span class="badge bg-secondary">Pausado</span>
                                     {% endif %}
                                 </div>
-                                <small class="text-muted">
-                                    <i class="fas fa-paper-plane"></i> {{ servico.solicitacoes|length }} solicitações
-                                </small>
+                                {% set num_solicitacoes = servico.solicitacoes|length %}
+                                {% if num_solicitacoes > 0 %}
+                                    <a href="{{ url_for('trabalhador.listar_solicitacoes') }}" class="text-decoration-none">
+                                        <small class="text-primary">
+                                            <i class="fas fa-paper-plane"></i> {{ num_solicitacoes }} solicitação{% if num_solicitacoes != 1 %}ões{% endif %}
+                                        </small>
+                                    </a>
+                                {% else %}
+                                    <small class="text-muted">
+                                        <i class="fas fa-paper-plane"></i> Nenhuma solicitação
+                                    </small>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="card-footer bg-transparent">
