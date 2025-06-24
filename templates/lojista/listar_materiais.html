@@ -26,9 +26,24 @@
                                         <i class="fas fa-ellipsis-v"></i>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit"></i> Editar</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('lojista.editar_material', material_id=material.id) }}"><i class="fas fa-edit"></i> Editar</a></li>
+                                        <li>
+                                            <form method="POST" action="{{ url_for('lojista.toggle_material', material_id=material.id) }}" style="display: inline;">
+                                                <button type="submit" class="dropdown-item">
+                                                    {% if material.disponivel %}
+                                                        <i class="fas fa-pause"></i> Desativar
+                                                    {% else %}
+                                                        <i class="fas fa-play"></i> Ativar
+                                                    {% endif %}
+                                                </button>
+                                            </form>
+                                        </li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash"></i> Excluir</a></li>
+                                        <li>
+                                            <button type="button" class="dropdown-item text-danger" onclick="confirmarExclusao({{ material.id }}, '{{ material.nome }}')">
+                                                <i class="fas fa-trash"></i> Excluir
+                                            </button>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -76,14 +91,14 @@
                                     {% endif %}
                                 </div>
                                 
-                                <!-- Botão para alternar disponibilidade -->
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" {% if material.disponivel %}checked{% endif %} 
-                                           onchange="toggleDisponibilidade({{ material.id }})">
-                                    <label class="form-check-label small text-muted">
-                                        Ativo
-                                    </label>
-                                </div>
+                                <!-- Status do material -->
+                                <small class="text-muted">
+                                    {% if material.disponivel %}
+                                        <i class="fas fa-check-circle text-success"></i> Disponível
+                                    {% else %}
+                                        <i class="fas fa-pause-circle text-secondary"></i> Indisponível
+                                    {% endif %}
+                                </small>
                             </div>
                         </div>
                         <div class="card-footer bg-transparent">
@@ -133,11 +148,35 @@
     {% endif %}
 </div>
 
+<!-- Modal de confirmação de exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o material <strong id="nomeMaterial"></strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta ação não pode ser desfeita!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-function toggleDisponibilidade(materialId) {
-    // Aqui seria implementada a funcionalidade para alternar disponibilidade via AJAX
-    // Por enquanto, apenas um placeholder
-    console.log('Alternar disponibilidade do material:', materialId);
+function confirmarExclusao(materialId, materialNome) {
+    document.getElementById('nomeMaterial').textContent = materialNome;
+    document.getElementById('formExclusao').action = `/lojista/materiais/excluir/${materialId}`;
+    new bootstrap.Modal(document.getElementById('modalExclusao')).show();
 }
 </script>
 {% endblock %}

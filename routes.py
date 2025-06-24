@@ -185,6 +185,99 @@ def criar_servico():
     
     return render_template('trabalhador/criar_servico.html', form=form)
 
+@trabalhador.route('/servicos/editar/<int:servico_id>', methods=['GET', 'POST'])
+@login_required
+def editar_servico(servico_id):
+    """Editar um serviço existente"""
+    if current_user.tipo_usuario != 'trabalhador':
+        abort(403)
+    
+    # Verificar se o serviço pertence ao trabalhador
+    servico = Servico.query.filter_by(
+        id=servico_id,
+        trabalhador_id=current_user.perfil_trabalhador.id
+    ).first()
+    
+    if not servico:
+        abort(404)
+    
+    form = FormularioServico()
+    if form.validate_on_submit():
+        servico.titulo = form.titulo.data
+        servico.descricao = form.descricao.data
+        servico.categoria = form.categoria.data
+        servico.tipo_preco = form.tipo_preco.data
+        servico.preco_minimo = form.preco_minimo.data
+        servico.preco_maximo = form.preco_maximo.data
+        
+        db.session.commit()
+        flash('Serviço atualizado com sucesso!', 'success')
+        return redirect(url_for('trabalhador.listar_servicos'))
+    
+    # Pré-preencher o formulário
+    form.titulo.data = servico.titulo
+    form.descricao.data = servico.descricao
+    form.categoria.data = servico.categoria
+    form.tipo_preco.data = servico.tipo_preco
+    form.preco_minimo.data = servico.preco_minimo
+    form.preco_maximo.data = servico.preco_maximo
+    
+    return render_template('trabalhador/editar_servico.html', form=form, servico=servico)
+
+@trabalhador.route('/servicos/excluir/<int:servico_id>', methods=['POST'])
+@login_required
+def excluir_servico(servico_id):
+    """Excluir um serviço"""
+    if current_user.tipo_usuario != 'trabalhador':
+        abort(403)
+    
+    # Verificar se o serviço pertence ao trabalhador
+    servico = Servico.query.filter_by(
+        id=servico_id,
+        trabalhador_id=current_user.perfil_trabalhador.id
+    ).first()
+    
+    if not servico:
+        abort(404)
+    
+    # Verificar se há solicitações pendentes ou aceitas
+    solicitacoes_ativas = SolicitacaoServico.query.filter_by(
+        servico_id=servico.id
+    ).filter(SolicitacaoServico.status.in_(['pendente', 'aceito'])).count()
+    
+    if solicitacoes_ativas > 0:
+        flash('Não é possível excluir o serviço pois há solicitações pendentes ou aceitas.', 'warning')
+        return redirect(url_for('trabalhador.listar_servicos'))
+    
+    db.session.delete(servico)
+    db.session.commit()
+    
+    flash('Serviço excluído com sucesso!', 'success')
+    return redirect(url_for('trabalhador.listar_servicos'))
+
+@trabalhador.route('/servicos/toggle/<int:servico_id>', methods=['POST'])
+@login_required
+def toggle_servico(servico_id):
+    """Ativar/desativar um serviço"""
+    if current_user.tipo_usuario != 'trabalhador':
+        abort(403)
+    
+    # Verificar se o serviço pertence ao trabalhador
+    servico = Servico.query.filter_by(
+        id=servico_id,
+        trabalhador_id=current_user.perfil_trabalhador.id
+    ).first()
+    
+    if not servico:
+        abort(404)
+    
+    servico.disponivel = not servico.disponivel
+    db.session.commit()
+    
+    status = 'ativado' if servico.disponivel else 'desativado'
+    flash(f'Serviço {status} com sucesso!', 'success')
+    return redirect(url_for('trabalhador.listar_servicos'))
+
 @trabalhador.route('/solicitacoes')
 @login_required
 def listar_solicitacoes():
@@ -226,7 +319,7 @@ def aceitar_solicitacao(solicitacao_id):
     
     # Aceitar a solicitação
     solicitacao.status = 'aceito'
-    solicitacao.data_resposta = datetime.utcnow()
+    solicitacao.data_resposta = datetime.now()
     db.session.commit()
     
     flash(f'Solicitação de {solicitacao.cliente.usuario.nome} foi aceita!', 'success')
@@ -254,7 +347,7 @@ def recusar_solicitacao(solicitacao_id):
     
     # Recusar a solicitação
     solicitacao.status = 'recusado'
-    solicitacao.data_resposta = datetime.utcnow()
+    solicitacao.data_resposta = datetime.now()
     db.session.commit()
     
     flash(f'Solicitação de {solicitacao.cliente.usuario.nome} foi recusada.', 'info')
@@ -444,6 +537,90 @@ def criar_material():
         return redirect(url_for('lojista.listar_materiais'))
     
     return render_template('lojista/criar_material.html', form=form)
+
+@lojista.route('/materiais/editar/<int:material_id>', methods=['GET', 'POST'])
+@login_required
+def editar_material(material_id):
+    """Editar um material existente"""
+    if current_user.tipo_usuario != 'lojista':
+        abort(403)
+    
+    # Verificar se o material pertence ao lojista
+    material = Material.query.filter_by(
+        id=material_id,
+        lojista_id=current_user.perfil_lojista.id
+    ).first()
+    
+    if not material:
+        abort(404)
+    
+    form = FormularioMaterial()
+    if form.validate_on_submit():
+        material.nome = form.nome.data
+        material.descricao = form.descricao.data
+        material.categoria = form.categoria.data
+        material.preco = form.preco.data
+        material.unidade = form.unidade.data
+        material.estoque = form.estoque.data
+        
+        db.session.commit()
+        flash('Material atualizado com sucesso!', 'success')
+        return redirect(url_for('lojista.listar_materiais'))
+    
+    # Pré-preencher o formulário
+    form.nome.data = material.nome
+    form.descricao.data = material.descricao
+    form.categoria.data = material.categoria
+    form.preco.data = material.preco
+    form.unidade.data = material.unidade
+    form.estoque.data = material.estoque
+    
+    return render_template('lojista/editar_material.html', form=form, material=material)
+
+@lojista.route('/materiais/excluir/<int:material_id>', methods=['POST'])
+@login_required
+def excluir_material(material_id):
+    """Excluir um material"""
+    if current_user.tipo_usuario != 'lojista':
+        abort(403)
+    
+    # Verificar se o material pertence ao lojista
+    material = Material.query.filter_by(
+        id=material_id,
+        lojista_id=current_user.perfil_lojista.id
+    ).first()
+    
+    if not material:
+        abort(404)
+    
+    db.session.delete(material)
+    db.session.commit()
+    
+    flash('Material excluído com sucesso!', 'success')
+    return redirect(url_for('lojista.listar_materiais'))
+
+@lojista.route('/materiais/toggle/<int:material_id>', methods=['POST'])
+@login_required
+def toggle_material(material_id):
+    """Ativar/desativar um material"""
+    if current_user.tipo_usuario != 'lojista':
+        abort(403)
+    
+    # Verificar se o material pertence ao lojista
+    material = Material.query.filter_by(
+        id=material_id,
+        lojista_id=current_user.perfil_lojista.id
+    ).first()
+    
+    if not material:
+        abort(404)
+    
+    material.disponivel = not material.disponivel
+    db.session.commit()
+    
+    status = 'ativado' if material.disponivel else 'desativado'
+    flash(f'Material {status} com sucesso!', 'success')
+    return redirect(url_for('lojista.listar_materiais'))
 
 # Blueprint do administrador
 admin = Blueprint('admin', __name__)

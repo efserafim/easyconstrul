@@ -4,6 +4,8 @@
 Platform Flask para conectar trabalhadores da construção civil, clientes e fornecedores de materiais. Sistema completo com 4 tipos de usuários: trabalhadores, clientes, lojistas e administradores.
 
 ## Recent Changes
+- **2024-12-24**: All edit and delete functionalities fixed and fully working for services and materials
+- **2024-12-24**: Complete CRUD operations implemented with proper security checks
 - **2024-12-20**: Material marketplace for clients implemented - clients can now browse and purchase construction materials from suppliers
 - **2024-12-20**: Worker request management system completed - workers can accept/reject/complete service requests
 - **2024-12-20**: PostgreSQL database added and configured
